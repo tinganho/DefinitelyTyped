@@ -785,8 +785,8 @@ declare namespace grunt {
              *
              * @note taskFunction.apply(scope: grunt.task.ITask, args: any[])
              */
-            registerTask(taskName: string, taskFunction: Function): void
-            registerTask(taskName: string, description: string, taskFunction: Function): void
+            registerTask<T>(taskName: string, taskFunction: (this: ITask<T>, ...args: any[]) => any): void
+            registerTask<T>(taskName: string, description: string, taskFunction: (this: ITask<T>, ...args: any[]) => any): void
 
             /**
              * Register a "multi task." A multi task is a task that implicitly iterates over all of its
@@ -796,8 +796,8 @@ declare namespace grunt {
              *
              * @note taskFunction.apply(scope: grunt.task.IMultiTask<any>, args: any[])
              */
-            registerMultiTask(taskName: string, taskFunction: Function): void
-            registerMultiTask(taskName: string, taskDescription: string, taskFunction: Function): void
+            registerMultiTask<D, O>(taskName: string, description: string, taskFunction: (this: IMultiTask<D, O>, ...args: any[]) => any): void
+            registerMultiTask<D, O>(taskName: string, taskFunction: (this: IMultiTask<D, O>, ...args: any[]) => any): void
 
             /**
              * Check with the name, if a task exists in the registered tasks.
@@ -843,7 +843,7 @@ declare namespace grunt {
              * The currently running task or multitask.
              * @see http://gruntjs.com/api/inside-tasks
              */
-            current: grunt.task.IMultiTask<any>
+            current: grunt.task.IMultiTask<any, any>
         }
 
         interface AsyncResultCatcher {
@@ -862,7 +862,7 @@ declare namespace grunt {
          *
          * Grunt version 0.4.x
          */
-        interface ITask {
+        interface ITask<T> {
 
             /**
              * If a task is asynchronous, this method must be invoked to instruct Grunt to wait.
@@ -940,14 +940,13 @@ declare namespace grunt {
              * object properties, which will be further overridden in multi tasks by any target-level
              * options object properties.
              */
-            options(defaultsObj: any): ITaskOptions
-            options<T>(defaultsObj: T): T
+            options(defaultsObj: T): T
         }
 
         /**
          * {@link http://gruntjs.com/inside-tasks#inside-multi-tasks}
          */
-        interface IMultiTask<T> extends ITask {
+        interface IMultiTask<D, O> extends ITask<O> {
             /**
              * In a multi task, this property contains the name of the target currently being iterated over.
              * For example, if a "sample" multi task was run as grunt sample:foo with the config data
@@ -990,7 +989,7 @@ declare namespace grunt {
              * @note It is recommended that this.options this.files and this.filesSrc are used instead of this.data,
              *       as their values are normalized.
              */
-            data: T
+            data: D
         }
 
         /**

@@ -1,18 +1,19 @@
 
 
-// Official code sample from 
+// Official code sample from
 // http://gruntjs.com/getting-started#an-example-gruntfile
 
-interface MyTaskData {
-    repeat: number;
-}
 
-interface MyOptions {
-    sourceRoot: string;
-}
-
-// exports should work same as module.exports 
+// exports should work same as module.exports
 exports = (grunt: IGrunt) => {
+
+    interface Data {
+        repeat: number;
+    }
+
+    interface Options {
+        sourceRoot: string;
+    }
 
     // Project configuration.
     grunt.initConfig({
@@ -34,14 +35,13 @@ exports = (grunt: IGrunt) => {
     // Default task(s).
     grunt.registerTask('default', ['uglify']);
 
-    grunt.registerMultiTask('mytask', "short description", function() {
-        var currenttask: grunt.task.IMultiTask<MyTaskData> = this;
-        var options = currenttask.options<MyOptions>({
+    grunt.registerMultiTask<Data, Options>('mytask', "short description", function() {
+        var options = this.options({
             sourceRoot: "default"
         });
         var valid = false;
         valid = valid && options.sourceRoot === "default";
-        valid = valid && currenttask.data.repeat > 0;
+        valid = valid && this.data.repeat > 0;
 
         var done = this.async();
         done();
@@ -88,10 +88,19 @@ exports = (grunt: IGrunt) => {
 // https://github.com/gruntjs/grunt-init-gruntplugin/blob/master/root/tasks/name.js
 exports.exports = function(grunt: IGrunt) {
 
+    interface Data {
+        repeat: number;
+    }
+
+    interface Options {
+        punctuation: string;
+        separator: string;
+    }
+
     // Please see the Grunt documentation for more information regarding task
     // creation: http://gruntjs.com/creating-tasks
 
-    grunt.registerMultiTask('taskName', 'task description', function() {
+    grunt.registerMultiTask<Data, Options>('taskName', 'task description', function() {
         // Merge task-specific and/or target-specific options with these defaults.
         var options = this.options({
             punctuation: '.',
